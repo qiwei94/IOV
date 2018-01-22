@@ -636,7 +636,7 @@ def login():
 	else:
 		res_data={"type":"failure","data":"NOT OK","msg":"dengluSHIBAI"}
 		res=json.dumps(res_data)
-		rv = make_response(res,400)
+		rv = make_response(res,200)
 
 	return rv
 
