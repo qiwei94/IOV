@@ -122,7 +122,7 @@ def get_com_one_driver():
 	print driver_id
 
 	CMD=\
-	"SELECT driver_name,sex,idcard,phone,driver_address,license_type,license,license_from_date,license_end_date,team,image,driver_qualification,driver_qualification_date"+\
+	"SELECT driver_name,sex,idcard,phone,driver_address,license_type,license,driver_inspect_date,license_from_date,license_end_date,team,image,driver_qualification,driver_qualification_date"+\
 	" FROM driver "+\
 	"WHERE com_id = " +str(com_id) +" AND driver_id =" +str(driver_id)
 	
@@ -271,24 +271,47 @@ def add_driver_info():
 
 @app.route('/update_driver_info',methods=['POST'])
 def update_driver_info():
-	driver_id=request.form['driver_id']
-	driver_name=request.form['driver_name']
-	team=request.form['team']
-	sex=request.form['sex']
-	idcard=request.form['idcard']
-	com_id=request.form['com_id']
-	license=request.form['license']
-	license_type=request.form['license_type']
-	image=request.form['image']
-	license_from_date=request.form['license_from_date']
-	license_end_date=request.form['license_end_date']
-	driver_address=request.form['driver_address']
-	driver_qualification=request.form['driver_qualification']
-	driver_qualification_date=request.form['driver_qualification_date']
-	driver_inspect_date=request.form['driver_inspect_date']
-	driver_illegal=request.form['driver_illegal']
-	phone=request.form['phone']
+	#print "????????"
+	
+	#print request.form
 
+
+	driver_id=request.form['driver_id']
+	print driver_id
+	driver_name=request.form['driver_name']
+	print driver_name
+	team=request.form['team']
+	print team
+	sex=request.form['sex']
+	print sex
+	idcard=request.form['idcard']
+	print idcard
+	com_id=request.form['com_id']
+	print com_id
+	license=request.form['license']
+	print license
+	license_type=request.form['license_type']
+	print license_type
+	#image=request.form['image']
+	image="123454"
+	print image
+	license_from_date=request.form['license_from_date']
+	print license_from_date
+	license_end_date=request.form['license_end_date']
+	print license_end_date
+	driver_address=request.form['driver_address']
+	print driver_address
+	driver_qualification=request.form['driver_qualification']
+	print driver_qualification
+	driver_qualification_date=request.form['driver_qualification_date']
+	print driver_qualification_date
+	driver_inspect_date=request.form['driver_inspect_date']
+	print driver_inspect_date
+	driver_illegal=request.form['driver_illegal']
+	print driver_illegal
+	phone=request.form['phone']
+	print phone
+	"""
 	print driver_id
 	print driver_name
 	print team
@@ -306,7 +329,7 @@ def update_driver_info():
 	print driver_inspect_date
 	print driver_illegal
 	print phone
-	
+	"""
 
 	CMD=\
 	"UPDATE driver SET driver_name = "+\
@@ -847,8 +870,6 @@ def get_sensor_info(com_id):
 	print CMD
 
 	res_json=con_exe(CMD)
-	
-
 	
 	res_return={"type":"success","data":res_json,"msg":"success"}
 	#res_return=res_json
