@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 #!/usr/bin/python
 from flask import Flask
 from flask import request
@@ -68,8 +69,7 @@ def con_exe(CMD):
 
 	cursor.execute(CMD)
 	conn.commit()
-	if ("DELETE" in CMD or "UPDATE" in CMD):
-		print "DELETE in CMD"
+	if ("DELETE" in CMD or "UPDATE" in CMD or "INSERT" in CMD):
 		cursor.close()
 		conn.close()
 		return "delete success"
@@ -111,7 +111,7 @@ def get_com_driver():
 
 
 
-@app.route('/driver_one_com_info',methods=[' '])
+@app.route('/driver_one_com_info',methods=['POST'])
 def get_com_one_driver():
 	com_id=request.form['com_id']
 	driver_id = request.form['driver_id']
@@ -138,25 +138,47 @@ def get_com_one_driver():
 
 @app.route('/add_driver_info',methods=['POST'])
 def add_driver_info():
-	driver_id=request.form['driver_id']
+	print "why can not get anythin??"
+	#driver_id=request.form['driver_id']
+	
 	driver_name=request.form['driver_name']
+	print driver_name
 	team=request.form['team']
+	print team
 	sex=request.form['sex']
+	print sex
 	idcard=request.form['idcard']
+	print idcard
 	com_id=request.form['com_id']
+	print com_id
 	license=request.form['license']
+	print license
 	license_type=request.form['license_type']
-	image=request.form['image']
-	license_from_date=request.form['license_from_date']
-	license_end_date=request.form['license_end_date']
-	driver_address=request.form['driver_address']
-	driver_qualification=request.form['driver_qualification']
-	driver_qualification_date=request.form['driver_qualification_date']
-	driver_inspect_date=request.form['driver_inspect_date']
-	driver_illegal=request.form['driver_illegal']
-	phone=request.form['phone']
+	print license_type
+	
 
-	print driver_id
+	#image=request.form['image']
+	image="12344"
+	#print image
+	
+
+	license_from_date=request.form['license_from_date']
+	print license_from_date
+	license_end_date=request.form['license_end_date']
+	print license_end_date
+	driver_address=request.form['driver_address']
+	print driver_address
+	driver_qualification=request.form['driver_qualification']
+	print driver_qualification
+	driver_qualification_date=request.form['driver_qualification_date']
+	print driver_qualification_date
+	driver_inspect_date=request.form['driver_inspect_date']
+	print driver_inspect_date
+	driver_illegal=request.form['driver_illegal']
+	print driver_illegal
+	phone=request.form['phone']
+	print phone
+	#print driver_id
 	print driver_name
 	print team
 	print sex
@@ -173,28 +195,45 @@ def add_driver_info():
 	print driver_inspect_date
 	print driver_illegal
 	print phone
+
+
+	CMD = "select max(driver_id) from driver;"
+	res_json = con_exe(CMD)
+	print res_json[0]['max']
+	driver_id1=res_json[0]['max']
+	driver_id=int(driver_id1)+1
 	
 
+	#print str()
+	"""
 	CMD=\
 	"INSERT INTO driver (driver_id,driver_name,team,sex,idcard,com_id,license,license_type,image,license_from_date,license_end_date,driver_address,driver_qualification,"+\
-	"driver_qualification_date,driver_inspect_date,driver_illegal,phone) VALUES ( "+\
-	"\'"+str(driver_id)+"\',"+\
-	"\'"+str(driver_name)+"\',"+\
-	"\'"+str(team)+"\',"+\
-	"\'"+str(sex)+"\',"+\
-	"\'"+str(idcard)+"\',"+\
-	"\'"+str(com_id)+"\',"+\
-	"\'"+str(license)+"\',"+\
-	"\'"+str(license_type)+"\',"+\
-	"\'"+str(image)+"\',"+\
-	"\'"+str(license_from_date)+"\',"+\
-	"\'"+str(license_end_date)+"\',"+\
-	"\'"+str(driver_address)+"\',"+\
-	"\'"+str(driver_qualification)+"\',"+\
-	"\'"+str(driver_qualification_date)+"\',"+\
-	"\'"+str(driver_inspect_date)+"\',"+\
-	"\'"+str(driver_illegal)+"\',"+\
-	"\'"+str(phone)+"\')"
+	"driver_qualification_date,driver_inspect_date,driver_illegal) VALUES ("+\
+	str(driver_id)+","+\
+	str(driver_name)+","+\
+	str(team)+","+\
+	str(sex)+","+\
+	str(idcard)+","+\
+	str(com_id)+","+\
+	str(license)+","+\
+	str(license_type)+","+\
+	str(image)+","+\
+	str(license_from_date)+","+\
+	str(license_end_date)+","+\
+	str(driver_address)+","+\
+	str(driver_qualification)+","+\
+	str(driver_qualification_date)+","+\
+	str(driver_inspect_date)+","+\
+	str(driver_illegal)+");"
+	#"\'"+str(phone)+"\' )"
+	"""
+	CMD=\
+	"INSERT INTO driver (driver_id,driver_name) VALUES ("+\
+	str(driver_id)+","+\
+	str(driver_name)+");"
+	#"\'"+str(phone)+"\' )"
+	
+
 
 	res_json = con_exe(CMD)
 	
@@ -203,6 +242,7 @@ def add_driver_info():
 	res_return={"type":"success","data":res_json,"msg":"success"}
 	#res_return=res_json
 	res=json.dumps(res_return,cls=DateTimeEncoder,indent=2,sort_keys=True)
+
 	rv = make_response(res,200)
 	
 	return rv
@@ -468,8 +508,6 @@ def update_vehicle_info():
 	act_time_to_arri=request.form['act_time_to_arri']
 	departure=request.form['departure']
 	destination=request.form['destination']
-
-
 	
 	CMD="UPDATE vehicle  set vehicle_number="+\
 	"\'"+str(vehicle_number)+"\',vehicle_type="+\
@@ -648,19 +686,19 @@ def login():
 ##################################### exception ######################################
 ######################################################################################
 
-@app.route('/exceptions',methods=['GET'])
-def get_exception():
-	CMD = 	"SELECT "+\
-			"exceptions.key_id as ex_id,"+\
-			"exceptions.type_id as ex_trg,"+\
-			"exceptions.sensor_exp_starttime as creat_at,"+\
-			"exceptions.exp_evidence as ex_evidence, "+\
-			"driver.license as license,"+\
-			"driver.driver_name as driver,"+\
-			"driver.phone as telephone,"+\
-			"driver.team as team "+\
-			"FROM driver,exceptions "+\
-			"WHERE is_processed = 'no' AND exceptions.driver_id=driver.driver_id "
+@app.route('/exceptions/<int:com_id>',methods=['GET'])
+def get_exception(com_id):
+	CMD="SELECT "+\
+		"exceptions.key_id as ex_id," + \
+		"exceptions.type_id as ex_trg ,"+\
+		"exceptions.sensor_exp_starttime as creat_at,"+\
+		"exceptions.exp_evidence as ex_evidence, "+\
+		"driver.license as license,"+\
+		"driver.driver_name as driver,"+\
+		"driver.phone as telephone,"+\
+		"driver.team as team "+\
+		"FROM driver,exceptions "+\
+		"WHERE is_processed = 'no' AND exceptions.driver_id=driver.driver_id AND driver.com_id="+str(com_id)
 
 	print CMD
 
@@ -673,10 +711,12 @@ def get_exception():
 	return rv
 
 
-@app.route('/exceptions/report/<int:ex_id>',methods=['GET'])
-def report_exception(ex_id):
+@app.route('/exceptions/affirm',methods=['POST'])
+def report_exception():
 	
-
+	ex_id=request.form['ex_id']
+	com_id=request.form['com_id']
+	"""
 	CMD = 	"SELECT "+\
 			"exceptions.key_id as ex_id,"+\
 			"exceptions.type_id as ex_trg,"+\
@@ -687,9 +727,11 @@ def report_exception(ex_id):
 			"driver.phone as telephone,"+\
 			"driver.team as team "+\
 			"FROM driver,exceptions "+\
-			"WHERE is_processed = 'no' AND exceptions.driver_id=driver.driver_id AND exceptions.key_id="+\
-			str(ex_id)
-
+			"WHERE is_processed = 'no' AND exceptions.driver_id=driver.driver_id AND exceptions.key_id="+str(ex_id)+\
+			"AND driver.com_id="+str(com_id)
+	"""
+	CMD = "update exceptions set is_processed='yes' WHERE ex_id="+str(ex_id)
+	
 	print CMD
 
 	res_json=con_exe(CMD)
@@ -720,10 +762,15 @@ def ignore_exception():
 	return rv
 
 
-@app.route('/exceptions/get_processed',methods=['GET'])
+@app.route('/exceptions/get_processed',methods=['POST'])
 def get_processed_exception():
-	
-	CMD = 	"SELECT "+\
+	com_id=request.form['com_id']
+	type_id=request.form['type_id']
+	print com_id
+	print type_id
+	if type_id=='0':
+		print "it is zero"
+		CMD = 	"SELECT "+\
 			"exceptions.key_id as ex_id,"+\
 			"exceptions.type_id as ex_trg,"+\
 			"exceptions.sensor_exp_starttime as creat_at,"+\
@@ -733,7 +780,20 @@ def get_processed_exception():
 			"driver.phone as telephone,"+\
 			"driver.team as team "+\
 			"FROM driver,exceptions "+\
-			"WHERE is_processed = 'yes' AND exceptions.driver_id=driver.driver_id "
+			"WHERE is_processed = 'yes' AND exceptions.driver_id=driver.driver_id AND driver.com_id="+str(com_id)
+	else:
+		CMD = 	"SELECT "+\
+			"exceptions.key_id as ex_id,"+\
+			"exceptions.type_id as ex_trg,"+\
+			"exceptions.sensor_exp_starttime as creat_at,"+\
+			"exceptions.exp_evidence as ex_evidence, "+\
+			"driver.license as license,"+\
+			"driver.driver_name as driver,"+\
+			"driver.phone as telephone,"+\
+			"driver.team as team "+\
+			"FROM driver,exceptions "+\
+			" WHERE is_processed = 'yes' AND exceptions.driver_id=driver.driver_id AND driver.com_id="+str(com_id)+\
+			" AND exceptions.type_id = "+str(type_id)
 
 	print CMD
 
