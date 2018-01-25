@@ -181,23 +181,7 @@ def add_driver_info():
 	print driver_illegal
 	phone=request.form['phone']
 	print phone
-	#print driver_id
-	print driver_name
-	print team
-	print sex
-	print idcard
-	print com_id
-	print license
-	print license_type
-	print image
-	print license_from_date
-	print license_end_date
-	print driver_address
-	print driver_qualification
-	print driver_qualification_date
-	print driver_inspect_date
-	print driver_illegal
-	print phone
+
 
 
 	CMD = "select max(driver_id) from driver;"
@@ -462,6 +446,13 @@ def get_com_next_vehicle():
 @app.route('/add_vehicle_info',methods=['POST'])
 def add_vehicle():
 	
+	com_id=request.form['com_id']
+	vehicle_number=request.form['vehicle_number']
+	vehicle_type=request.form['vehicle_type']
+	service_date=request.form['service_date']
+	inspect_date=request.form['inspect_date']
+
+	"""
 	vehicle_id=request.form['vehicle_id']
 	vehicle_number=request.form['vehicle_number']
 	vehicle_type=request.form['vehicle_type']
@@ -483,9 +474,9 @@ def add_vehicle():
 	act_time_to_arri=request.form['act_time_to_arri']
 	departure=request.form['departure']
 	destination=request.form['destination']
+	"""
 
-
-	
+	"""
 	CMD="INSERT INTO vehicle (vehicle_id,vehicle_number,vehicle_type,sensor_id,com_id,service_date,inspect_date,flapper,tonnage,"+\
 	"engine,frame,insurance_startdate,insurance_enddate,image,driver_id,time_to_dep,act_time_to_dep,time_to_arri,"+\
 	"act_time_to_arri,departure,destination) "+\
@@ -511,7 +502,21 @@ def add_vehicle():
 	"\'"+str(act_time_to_arri)+"\',"+\
 	"\'"+str(departure)+"\',"+\
 	"\'"+str(destination)+"\'"+")"
+	"""
+	CMD = "select max(driver_id) from driver;"
+	res_json = con_exe(CMD)
+	print res_json[0]['max']
+	vehicle_id_old=res_json[0]['max']
+	vehicle_id=int(vehicle_id_old)+1
 
+	CMD="INSERT INTO vehicle (vehicle_id,vehicle_number,vehicle_type,com_id,service_date,inspect_date) "+\
+	"VALUES ("+\
+	"\'"+str(vehicle_id)+"\',"+\
+	"\'"+str(vehicle_number)+"\',"+\
+	"\'"+str(vehicle_type)+"\',"+\
+	"\'"+str(sensor_id)+"\',"+\
+	"\'"+str(service_date)+"\',"+\
+	"\'"+str(inspect_date)+"\',)"
 	
 	print CMD
 
@@ -529,6 +534,13 @@ def add_vehicle():
 
 @app.route('/update_vehicle_info',methods=['POST'])
 def update_vehicle_info():
+
+	com_id=request.form['com_id']
+	vehicle_number=request.form['vehicle_number']
+	vehicle_type=request.form['vehicle_type']
+	service_date=request.form['service_date']
+	inspect_date=request.form['inspect_date']
+	"""
 	vehicle_id=request.form['vehicle_id']
 	vehicle_number=request.form['vehicle_number']
 	vehicle_type=request.form['vehicle_type']
@@ -572,7 +584,14 @@ def update_vehicle_info():
 	"\'"+str(act_time_to_arri)+"\',departure="+\
 	"\'"+str(departure)+"\',destination="+\
 	"\'"+str(destination)+"\'"+" WHERE vehicle_id="+str(vehicle_id)
+	"""
 
+	CMD="UPDATE vehicle  set vehicle_number="+\
+	"\'"+str(vehicle_number)+"\',vehicle_type="+\
+	"\'"+str(vehicle_type)+"\',sensor_id="+\
+	"\'"+str(com_id)+"\',service_date="+\
+	"\'"+str(service_date)+"\',inspect_date="+\
+	"\'"+str(inspect_date)+"\' WHERE vehicle_id="+str(vehicle_id)
 
 
 	res_json = con_exe(CMD)
