@@ -1,4 +1,7 @@
 # -*- coding: UTF-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
 #!/usr/bin/python
 from flask import Flask
 from flask import request
@@ -157,9 +160,9 @@ def add_driver_info():
 	print license_type
 	
 
-	#image=request.form['image']
-	image="12344"
-	#print image
+	image=request.form['image']
+	#image="12344"
+	print image
 	
 
 	license_from_date=request.form['license_from_date']
@@ -204,7 +207,7 @@ def add_driver_info():
 	driver_id=int(driver_id1)+1
 	
 
-	#print str()
+	print str()
 	"""
 	CMD=\
 	"INSERT INTO driver (driver_id,driver_name,team,sex,idcard,com_id,license,license_type,image,license_from_date,license_end_date,driver_address,driver_qualification,"+\
@@ -227,10 +230,25 @@ def add_driver_info():
 	str(driver_illegal)+");"
 	#"\'"+str(phone)+"\' )"
 	"""
-	CMD=\
-	"INSERT INTO driver (driver_id,driver_name) VALUES ("+\
-	str(driver_id)+","+\
-	str(driver_name)+");"
+
+	CMD = "INSERT INTO driver (driver_id,driver_name,team,sex,idcard,com_id,license,license_type,image,license_from_date,license_end_date,driver_address,driver_qualification,driver_qualification_date,driver_inspect_date,driver_illegal,phone) VALUES ('"+\
+	str(driver_id)+"','"+\
+	str(driver_name)+"','"+\
+	str(team)+"','"+\
+	str(sex)+"','"+\
+	str(idcard)+"','"+\
+	str(com_id)+"','"+\
+	str(license)+"','"+\
+	str(license_type)+"','"+\
+	str(image)+"','"+\
+	str(license_from_date)+"','"+\
+	str(license_end_date)+"','"+\
+	str(driver_address)+"','"+\
+	str(driver_qualification)+"','"+\
+	str(driver_qualification_date)+"','"+\
+	str(driver_inspect_date)+"','"+\
+	str(driver_illegal)+"','"+\
+	str(phone)+"');"
 	#"\'"+str(phone)+"\' )"
 	
 
@@ -246,6 +264,7 @@ def add_driver_info():
 	rv = make_response(res,200)
 	
 	return rv
+
 
 
 
@@ -815,6 +834,7 @@ def get_processed_exception():
 @app.route('/sensor_info/<int:com_id>',methods=['GET'])
 def get_sensor_info(com_id):
 	
+	#status  		取值 0 1 2 -1 （异常、在线、休眠、掉线）
 	CMD = 	"SELECT "+\
 			"sensor.status,"+\
 			"sensor.lone ,"+\
