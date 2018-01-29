@@ -10,6 +10,13 @@ from flask import url_for
 from flask import make_response
 from flask import jsonify
 from flask import Response
+from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms import SubmitField
+from flask import send_from_directory
+from werkzeug import secure_filename
+
 
 import json
 import psycopg2
@@ -18,12 +25,13 @@ import sys
 import pprint
 import time
 import decimal
+import os
 from psycopg2.extras import RealDictCursor
 
 from datetime import date, datetime
 from flask_cors import * 
 
-
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 
 HOST="101.200.181.242"
@@ -33,8 +41,11 @@ PASSWD="cptbtptp"
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+app.config['UPLOAD_FOLDER'] = os.getcwd()+"/driver_image"
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+
+CORS(app, supports_credentials=True)
 
 
 
@@ -86,6 +97,51 @@ def con_exe(CMD):
 	cursor.close()
 	conn.close()
 	return res_json
+######################################################################################
+####################################### upload  ######################################
+######################################################################################
+@app.route('/image_upload_test', methods=['POST'])
+def uplaod_image_request_test():
+	print "thius is "
+	file=request.files['image']
+	print "124"
+	print file.filename
+	rv = make_response()
+	return rv
+
+html = '''
+    <!DOCTYPE html>
+    <title>Upload File</title>
+    <h1>图片上传</h1>
+    <form method=post enctype=multipart/form-data>
+         <input type=file name=file>
+         <input type=submit value=上传>
+    </form>
+    '''
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],filename)
+
+@app.route('/image_upload', methods=['POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['image']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file_url = url_for('uploaded_file', filename=filename)
+            #return html + '<br><img src=' + file_url + '>'
+            data=file_url
+            return data
+
+    return 0
+
 
 ######################################################################################
 ####################################### driver  ######################################
@@ -159,8 +215,8 @@ def add_driver_info():
 	license_type=request.form['license_type']
 	print license_type
 	
-
-	image=request.form['image']
+	image=request.files['image']
+	url_for('uploaded_file', filename=image)
 	#image="12344"
 	print image
 	
@@ -445,7 +501,8 @@ def get_com_next_vehicle():
 
 @app.route('/add_vehicle_info',methods=['POST'])
 def add_vehicle():
-	
+	print request.form
+
 	com_id=request.form['com_id']
 	vehicle_number=request.form['vehicle_number']
 	vehicle_type=request.form['vehicle_type']
@@ -503,20 +560,22 @@ def add_vehicle():
 	"\'"+str(departure)+"\',"+\
 	"\'"+str(destination)+"\'"+")"
 	"""
-	CMD = "select max(driver_id) from driver;"
+	CMD = "select max(vehicle_id) from vehicle;"
 	res_json = con_exe(CMD)
 	print res_json[0]['max']
 	vehicle_id_old=res_json[0]['max']
 	vehicle_id=int(vehicle_id_old)+1
+
+	print vehicle_id
 
 	CMD="INSERT INTO vehicle (vehicle_id,vehicle_number,vehicle_type,com_id,service_date,inspect_date) "+\
 	"VALUES ("+\
 	"\'"+str(vehicle_id)+"\',"+\
 	"\'"+str(vehicle_number)+"\',"+\
 	"\'"+str(vehicle_type)+"\',"+\
-	"\'"+str(sensor_id)+"\',"+\
+	"\'"+str(com_id)+"\',"+\
 	"\'"+str(service_date)+"\',"+\
-	"\'"+str(inspect_date)+"\',)"
+	"\'"+str(inspect_date)+"\')"
 	
 	print CMD
 
@@ -528,8 +587,7 @@ def add_vehicle():
 	#res_return=res_json
 	res=json.dumps(res_return,cls=DateTimeEncoder,indent=2,sort_keys=True)
 	rv = make_response(res,200)
-	
-	
+
 	return rv
 
 @app.route('/update_vehicle_info',methods=['POST'])
